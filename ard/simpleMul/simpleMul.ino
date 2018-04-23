@@ -1,7 +1,10 @@
 #include <EEPROM.h>
 #include <SoftwareSerial.h>
-#define ENABLE 6
-#define LED 13
+
+
+
+#define ENABLE 6   //Used to switch rs485 module from tx/rx
+#define LED 13      //build in LED on board
 
 //not sure the colors are right yet
 #define RED 3
@@ -9,13 +12,24 @@
 #define BLUE 5
 
 SoftwareSerial rs485(8,7);
+
 unsigned long timer=millis();
 byte DEVICE=0;
-int msgDelay=0;
+
+/*
+Write a static number into EEPROM address 0
+Only call on a new board, or if the address needs to be changed
+*/
 void programID(){
   EEPROM.write(0,2);
 }
 
+
+
+/*
+Read device address from EEPROM address 0, currenly only a single 
+byte
+*/
 void readID(){
   DEVICE=EEPROM.read(0);
   if(DEVICE<1||DEVICE>20){
@@ -28,6 +42,10 @@ void readID(){
   Serial.println(DEVICE);
 }
 
+
+/*
+ * Some easy functions for blinking LED's on specified pins
+ */
 void blinkSlow(int pin){
   digitalWrite(pin,HIGH);
   delay(500);
@@ -48,24 +66,26 @@ void blinkVar(int pin,int d){
 
 
 void setup() {
-  Serial.begin(115200);
-  pinMode(RED,OUTPUT);
+  Serial.begin(115200);  //used for debug
+  pinMode(LED,OUTPUT);
+  pinMode(RED,OUTPUT);    //setup LEDs as OUTPUT
   pinMode(BLUE,OUTPUT);
   pinMode(GREEN,OUTPUT);
-  readID();
-  msgDelay=1000*DEVICE;
+  readID();         //Get device ID from EEPROM
   Serial.println("Starting");
   rs485.begin(9600);
-  pinMode(ENABLE,OUTPUT);
+  pinMode(ENABLE,OUTPUT);   //set as Rx to start
   digitalWrite(ENABLE,LOW);
 
 
+  //blink all LEDs to show they are working, and that startup
+  //has completed
   blinkSlow(LED);
   blinkSlow(RED);
   blinkSlow(BLUE);
   blinkSlow(GREEN);
   
-}
+}//End Setup
 
 void loop() {
   byte rx=0;
@@ -74,6 +94,7 @@ void loop() {
     Serial.print("Rx: ");
     rx=rs485.read();
     blinkFast(LED);
+    //blinkVar(RED,50);
     Serial.println(rx);
   }
 
@@ -82,5 +103,6 @@ void loop() {
     digitalWrite(ENABLE,HIGH);
     rs485.write(rx);
     digitalWrite(ENABLE,LOW);
+    //blinkFast(GREEN);
   }
-}
+}//End main loop
