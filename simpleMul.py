@@ -3,6 +3,10 @@
 import serial
 import time
 
+#add check for soc or pi and setup serial accordingly
+
+
+
 try:
 	ser=serial.Serial('/dev/ttymxc2',9600,timeout=1)
 except:
@@ -13,12 +17,8 @@ except:
 def main():
 	lastSend=time.time()
 	while True:
-		for n in range(1,3):
-			if n==1:
-				ser.write(1)
-			if n==2:
-				ser.write(2)
-			
+		for n in range(0,255):
+			ser.write(n)
 			time.sleep(.1)
 			resp=ser.read(1)
 			if resp==n:
