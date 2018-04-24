@@ -4,15 +4,14 @@
 
 
 #define ENABLE 6   //Used to switch rs485 module from tx/rx
-#define LED 13      //build in LED on board
 
 //not sure the colors are right yet
-#define RED 3
+#define RED 5
 #define GREEN 4
-#define BLUE 5
+#define BLUE 3
 
 SoftwareSerial rs485(8,7);
-
+unsigned long lastContact=millis();
 unsigned long timer=millis();
 byte DEVICE=0;
 
@@ -47,30 +46,34 @@ void readID(){
  * Some easy functions for blinking LED's on specified pins
  */
 void blinkSlow(int pin){
-  digitalWrite(pin,HIGH);
-  delay(500);
   digitalWrite(pin,LOW);
+  delay(500);
+  digitalWrite(pin,HIGH);
+  delay(100);
 }
 
 void blinkFast(int pin){
-  digitalWrite(pin,HIGH);
-  delay(200);
   digitalWrite(pin,LOW);
+  delay(200);
+  digitalWrite(pin,HIGH);
+  delay(100);
 }
 
 void blinkVar(int pin,int d){
-  digitalWrite(pin,HIGH);
-  delay(d);
   digitalWrite(pin,LOW);
+  delay(d);
+  digitalWrite(pin,HIGH);
 }
 
 
 void setup() {
   Serial.begin(115200);  //used for debug
-  pinMode(LED,OUTPUT);
   pinMode(RED,OUTPUT);    //setup LEDs as OUTPUT
   pinMode(BLUE,OUTPUT);
   pinMode(GREEN,OUTPUT);
+  digitalWrite(BLUE,HIGH);
+  digitalWrite(RED,HIGH);
+  digitalWrite(GREEN,HIGH);  
   readID();         //Get device ID from EEPROM
   Serial.println("Starting");
   rs485.begin(9600);
@@ -80,10 +83,13 @@ void setup() {
 
   //blink all LEDs to show they are working, and that startup
   //has completed
-  blinkSlow(LED);
   blinkSlow(RED);
   blinkSlow(BLUE);
   blinkSlow(GREEN);
+  blinkFast(RED);
+  blinkFast(BLUE);
+  blinkFast(GREEN);
+  
   
 }//End Setup
 
@@ -93,16 +99,19 @@ void loop() {
     delay(20);
     Serial.print("Rx: ");
     rx=rs485.read();
-    blinkFast(LED);
-    //blinkVar(RED,50);
+    blinkVar(RED,50);
     Serial.println(rx);
+  }
+  if(millis()-lastContact>30000){
+    blinkSlow(RED);
   }
 
   if(rx==DEVICE){
+    lastContact=millis();
     Serial.println("Thats for me!");
     digitalWrite(ENABLE,HIGH);
     rs485.write(rx);
     digitalWrite(ENABLE,LOW);
-    //blinkFast(GREEN);
+    blinkFast(GREEN);
   }
 }//End main loop
