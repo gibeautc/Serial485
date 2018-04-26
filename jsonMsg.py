@@ -4,7 +4,8 @@ import serial
 import time
 import json
 try:
-	ser=serial.Serial('/dev/ttymxc2',9600,timeout=1)
+	#ser=serial.Serial('/dev/ttymxc2',9600,timeout=1)
+	ser=serial.Serial('/dev/ttyUSB0',4800,timeout=1)
 except:
 	print("Error Opening Serial")
 	exit()
@@ -99,6 +100,7 @@ def main():
 	rxBuf=bytearray()
 	while True:
 		if ser.in_waiting==0:
+			print("Waiting...")
 			#give a chance for keyboard break
 			time.sleep(.5)
 		try:

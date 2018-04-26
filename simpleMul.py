@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# sudo chmod a+rw /dev/ttyUSB1
 
 import serial
 import time
@@ -8,7 +9,8 @@ import time
 
 
 try:
-	ser=serial.Serial('/dev/ttymxc2',9600,timeout=1)
+	#ser=serial.Serial('/dev/ttymxc2',9600,timeout=1)
+	ser=serial.Serial('/dev/ttyUSB0',4800,timeout=1)
 except:
 	print("Error Opening Serial")
 	exit()

@@ -2,10 +2,15 @@
 #include <SoftwareSerial.h>
 #include <ArduinoJson.h>
 
-#define ENABLE 7
-#define msgDelay 1500
+#define ENABLE 6   //Used to switch rs485 module from tx/rx
+#define RED 5
+#define GREEN 4
+#define BLUE 3
+#define DEBUGRATE 115200
+#define RS485RATE 4800
 
-SoftwareSerial rs485(8,9);
+
+SoftwareSerial rs485(8,7);
 byte userInput;
 byte rx;
 int msgNum=0;
@@ -33,11 +38,10 @@ void readID(){
 }
 
 void setup() {
-  Serial.begin(115200);
-  programID();
+  Serial.begin(DEBUGRATE);
   readID();
   Serial.println("Starting");
-  rs485.begin(9600);
+  rs485.begin(RS485RATE);
   pinMode(13,OUTPUT);
   digitalWrite(13,HIGH);
   delay(1000);
